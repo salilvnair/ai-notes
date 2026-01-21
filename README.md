@@ -1,3 +1,38 @@
+```java
+@SpringBootApplication
+public class Application {
+
+    static {
+        // ===== HARD OFFLINE =====
+        System.setProperty("DJL_OFFLINE", "true");
+        System.setProperty("ai.djl.offline", "true");
+        System.setProperty("ai.djl.repository.disable", "true");
+
+        // ===== FORCE WINDOWS PATHS =====
+        System.setProperty("ai.djl.cache.dir", "C:\\djl-cache");
+        System.setProperty("ai.djl.tmpdir", "C:\\djl-tmp");
+        System.setProperty("java.io.tmpdir", "C:\\djl-tmp");
+
+        // ===== PYTORCH INDEX KILL SWITCHES =====
+        System.setProperty("ai.djl.pytorch.disableIndex", "true");
+        System.setProperty("ai.djl.pytorch.use_index", "false");
+        System.setProperty("PYTORCH_INDEX_DISABLE", "true");
+
+        // ===== HF PARANOIA =====
+        System.setProperty("HF_HUB_OFFLINE", "1");
+        System.setProperty("HF_HUB_DISABLE_TELEMETRY", "1");
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+
+
+
+```
+
+
 # CosineSimilarityUtil 
 
 ```java
