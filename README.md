@@ -1,3 +1,15 @@
+```sql
+CREATE TABLE faq_embedding (
+    id UUID PRIMARY KEY,
+    question TEXT,
+    answer TEXT,
+    embedding JSONB,   -- or DOUBLE PRECISION[]
+    created_at TIMESTAMP DEFAULT now()
+);
+
+```
+
+
 ```md
 
 Step 1: Download LibTorch manually (one-time)
