@@ -1,3 +1,57 @@
+```md
+
+Step 1: Download LibTorch manually (one-time)
+
+On a machine with internet:
+
+https://pytorch.org/get-started/locally/
+
+Choose:
+
+OS: Windows
+
+Package: LibTorch
+
+Compute: CPU
+
+ZIP
+
+You’ll get something like:
+
+libtorch-win-shared-with-deps-2.x.x.zip
+
+Step 2: Extract it to a fixed location
+
+Example:
+
+C:\libtorch
+
+
+Inside must be:
+
+C:\libtorch\lib\libtorch.dll
+
+Step 3: Point DJL to it (THIS is the missing piece)
+
+Add before JVM starts:
+
+static {
+    System.setProperty("DJL_PYTORCH_HOME", "C:\\libtorch");
+    System.setProperty("DJL_OFFLINE", "true");
+}
+
+
+OR set environment variable:
+
+setx DJL_PYTORCH_HOME C:\libtorch
+
+
+👉 Now DJL will NOT call downloadPyTorch
+👉 It directly loads libtorch.dll
+
+```
+
+
 ```python
 
 [tool.poetry]
