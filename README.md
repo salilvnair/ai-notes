@@ -19,7 +19,12 @@ numpy = "^1.26.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-
+pip install \
+  fastapi==0.110.0 \
+  uvicorn==0.27.1 \
+  torch==2.2.1 \
+  sentence-transformers==2.7.0 \
+  numpy==1.26.4
 
 poetry install
 
