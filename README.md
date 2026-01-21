@@ -151,6 +151,74 @@ public class LocalE5LargeEmbeddingClient implements LlmClient, AutoCloseable {
         model.close();
     }
 }
+package com.example.embedding;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.springframework.stereotype.Service;
+
+import java.nio.file.Path;
+
+@Service
+public class EmbeddingService {
+
+    private LocalE5LargeEmbeddingClient client;
+
+    @PostConstruct
+    public void init() throws Exception {
+        client = new LocalE5LargeEmbeddingClient(
+                Path.of("models/e5-large")
+        );
+    }
+
+    public float[] embed(String text) {
+        return client.generateEmbeddings(text);
+    }
+
+    @PreDestroy
+    public void shutdown() throws Exception {
+        client.close();
+    }
+}
+
+
+    @PostMapping("/embed")
+    public float[] embed(@RequestBody EmbedRequest req) {
+        return embeddingService.embed(req.text());
+    }
+
+    @PostMapping("/similarity")
+    public SimilarityResponse similarity(
+            @RequestBody SimilarityRequest req) {
+
+        float[] a = embeddingService.embed(req.text1());
+        float[] b = embeddingService.embed(req.text2());
+
+        double score = CosineSimilarityUtil.cosine(a, b);
+        return new SimilarityResponse(score);
+    }
+
+
+public record EmbedRequest(String text) {}
+
+public record SimilarityRequest(String text1, String text2) {}
+
+public record SimilarityResponse(double cosineScore) {}
+
+
+
+```
+
+
+```json
+{
+  "text": "how do I reset my password"
+}
+
+
+{
+  "text1": "how do I reset my password",
+  "text2": "user can reset password from profile settings"
+}
 
 ```
