@@ -1,3 +1,130 @@
+```python
+
+[tool.poetry]
+name = "embedding-service"
+version = "0.1.0"
+description = "Offline embedding and cosine similarity service"
+authors = ["you"]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+
+fastapi = "^0.110.0"
+uvicorn = "^0.27.0"
+sentence-transformers = "^2.7.0"
+torch = "^2.2.0"
+numpy = "^1.26.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+
+poetry install
+
+
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+from sentence_transformers import SentenceTransformer
+import numpy as np
+import os
+
+# ======================================================
+# 🔒 HARD OFFLINE MODE
+# ======================================================
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+
+# ======================================================
+# 🔧 CONFIG
+# ======================================================
+MODEL_PATH = r"C:\models\e5-large"   # 👈 change if needed
+DEVICE = "cpu"
+
+# ======================================================
+# 🚀 APP
+# ======================================================
+app = FastAPI(title="Embedding & Cosine Service")
+
+print(f"Loading model from local path: {MODEL_PATH}")
+
+model = SentenceTransformer(
+    MODEL_PATH,
+    device=DEVICE
+)
+
+# ======================================================
+# 📦 DTOs
+# ======================================================
+class EmbedRequest(BaseModel):
+    text: str
+
+class EmbedResponse(BaseModel):
+    embedding: list[float]
+
+class CosineRequest(BaseModel):
+    text1: str
+    text2: str
+
+class CosineResponse(BaseModel):
+    cosineScore: float
+
+# ======================================================
+# 🧮 UTILS
+# ======================================================
+def embed_text(text: str) -> np.ndarray:
+    """
+    Embed text as a QUESTION.
+    """
+    text = "query: " + text
+    return model.encode(
+        text,
+        normalize_embeddings=True
+    )
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    """
+    Cosine similarity between two normalized vectors.
+    """
+    return float(np.dot(a, b))
+
+# ======================================================
+# 🔌 APIs
+# ======================================================
+@app.post("/embed", response_model=EmbedResponse)
+def embed(req: EmbedRequest):
+    vec = embed_text(req.text)
+    return EmbedResponse(embedding=vec.tolist())
+
+
+@app.post("/cosine", response_model=CosineResponse)
+def cosine(req: CosineRequest):
+    v1 = embed_text(req.text1)
+    v2 = embed_text(req.text2)
+
+    score = cosine_similarity(v1, v2)
+    return CosineResponse(cosineScore=score)
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+poetry run uvicorn embedding_service.app:app --host 0.0.0.0 --port 8000
+
+
+
+```
+
+
+
+
+
+
 ```java
 @SpringBootApplication
 public class Application {
